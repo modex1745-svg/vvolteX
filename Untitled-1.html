@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MODEX // Streetwear & Vision</title>
+    <title>VOLTERX // Streetwear & Vision</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -143,7 +143,7 @@
 
     <!-- ÜST BAR -->
     <header>
-        <div class="logo" onclick="location.reload()">MODEX<span>.</span></div>
+        <div class="logo" onclick="location.reload()">VOLTERX<span>.</span></div>
         <nav>
             <div id="userProfile" class="user-profile">
                 <img id="userImg" class="user-img" src="" alt="Profil">
@@ -203,7 +203,7 @@
             </div>
         </div>
 
-        <!-- YENİ DIŞARI ALINMIŞ SİBER ANİMASYON EKRANI -->
+        <!-- SİBER ANİMASYON EKRANI -->
         <div class="login-box sim-loader" id="simulationLoader">
             <div class="glow-text">[ ACCESS GRANTED ]</div>
             <div class="cyber-bar-container">
@@ -236,7 +236,7 @@
                     <form id="productForm" onsubmit="addProduct(event)">
                         <div class="form-group">
                             <label>Ürün Adı</label>
-                            <input type="text" id="prodTitle" placeholder="MODEX Heavy Tee" required>
+                            <input type="text" id="prodTitle" placeholder="VOLTERX Heavy Tee" required>
                         </div>
                         <div class="form-group">
                             <label>Ürün Açıklaması</label>
@@ -274,7 +274,7 @@
         <div class="product-grid" id="productGrid"></div>
     </div>
 
-    <footer>&copy; 2026 MODEX // LABS CORP.</footer>
+    <footer>&copy; 2026 VOLTERX // LABS CORP.</footer>
 
     <script>
         // Şifre maskeleme yapıları (Base64 kodlama mantığı)
@@ -282,8 +282,8 @@
         const tP = "dGFoYTEyMw==";
 
         const defaultProducts = [
-            { id: 1, title: "Modex Cyberpunk Boxy Tee", desc: "400 GSM ultra ağır pamuk, siber detay baskılı sokak kesim tişört.", price: 950, stock: 12, images: ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop"] },
-            { id: 2, title: "Modex Phantom Raw Hoodie", desc: "Eskitilmiş dikişli, yıkamalı antrasit gri oversize kalın kapüşonlu sweatshirt.", price: 1850, stock: 3, images: ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&auto=format&fit=crop"] }
+            { id: 1, title: "Volterx Cyberpunk Boxy Tee", desc: "400 GSM ultra ağır pamuk, siber detay baskılı sokak kesim tişört.", price: 950, stock: 12, images: ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop"] },
+            { id: 2, title: "Volterx Phantom Raw Hoodie", desc: "Eskitilmiş dikişli, yıkamalı antrasit gri oversize kalın kapüşonlu sweatshirt.", price: 1850, stock: 3, images: ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&auto=format&fit=crop"] }
         ];
         
         let products = JSON.parse(localStorage.getItem('vx_products')) || defaultProducts;
@@ -323,7 +323,6 @@
             else { toggleCart(true); }
         }
 
-        // DÜZELTİLEN VE TETİKLENEN ANİMASYONLU GİRİŞ FONKSİYONU
         function startLoginSimulation(type) {
             if (type === 'customer') {
                 const name = document.getElementById('customerNameInput').value.trim();
@@ -353,21 +352,15 @@
             }
         }
 
-        // Animasyon kutusunu görünür yapan ve css animasyonunu başlatan motor
         function triggerCyberAnimation(callback) {
             document.getElementById('loginBoxContent').style.display = 'none';
             document.getElementById('simulationLoader').style.display = 'flex';
             
             const bar = document.getElementById('cyberBarElement');
             bar.style.animation = 'none'; 
-            
-            // CSS Reflow tetikleme mekanizması
             void bar.offsetWidth; 
             
-            // Yükleme çubuğu animasyonu tetikleniyor
             bar.style.animation = 'loadProgress 1.8s cubic-bezier(0.075, 0.82, 0.165, 1) forwards';
-
-            // Animasyon bittiğinde sisteme aktarma yapılıyor
             setTimeout(callback, 1800);
         }
 
@@ -551,7 +544,7 @@
             if (cart.length === 0) { alert("Sepetiniz boş!"); return; }
             
             const user = JSON.parse(sessionStorage.getItem('currentUser'));
-            let message = `*MODEX ONLINE ORDER*\n\nMüşteri: ${user.displayName}\n\n`;
+            let message = `*VOLTERX ONLINE ORDER*\n\nMüşteri: ${user.displayName}\n\n`;
             let total = 0;
             
             cart.forEach(item => {
