@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MODEX // Streetwear & Vision</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+        body { background-color: #0e0e10; color: #f5f5f7; line-height: 1.6; }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0e0e10; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00ff66; }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding: 25px 5%; border-bottom: 1px solid #222; position: sticky; top: 0; background: rgba(14, 14, 16, 0.9); backdrop-filter: blur(12px); z-index: 100; }
+        .logo { font-size: 26px; font-weight: 700; letter-spacing: -1px; text-transform: uppercase; cursor: pointer; color: #fff; position: relative; }
+        .logo span { color: #00ff66; }
+        nav { display: flex; align-items: center; gap: 20px; }
+        
+        .user-profile { display: none; align-items: center; gap: 10px; background: #1e1e22; padding: 6px 14px; border: 1px solid #333; border-radius: 30px; }
+        .user-img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; filter: grayscale(1); }
+        .user-name { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #00ff66; }
+        
+        .nav-btn { background: none; border: 1px solid #333; color: #fff; padding: 10px 24px; font-size: 11px; font-weight: 600; text-transform: uppercase; cursor: pointer; letter-spacing: 1px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-btn:hover { border-color: #00ff66; color: #00ff66; background: rgba(0, 255, 102, 0.05); }
+        .cart-btn { background: #fff; color: #000; border-color: #fff; font-weight: 700; }
+        .cart-btn:hover { background: #00ff66; border-color: #00ff66; color: #000; }
+        .logout-btn { display: none; border-color: #ff3b30; color: #ff3b30; }
+        .logout-btn:hover { background: #ff3b30; color: #fff; border-color: #ff3b30; }
+
+        /* SEPET SLIDER */
+        .cart-sidebar { position: fixed; top: 0; right: -450px; width: 100%; max-width: 420px; height: 100%; background: #121214; border-left: 1px solid #222; z-index: 200; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; padding: 40px 30px; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 25px; }
+        .cart-header h3 { text-transform: uppercase; font-size: 16px; letter-spacing: 1px; font-weight: 700; }
+        .close-cart { font-size: 28px; cursor: pointer; font-weight: 300; color: #888; }
+        .close-cart:hover { color: #fff; }
+        .cart-items-list { flex-grow: 1; overflow-y: auto; margin-bottom: 25px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #333; font-size: 13px; }
+        .cart-item-info { display: flex; flex-direction: column; }
+        .remove-item-btn { background: none; border: none; color: #ff3b30; cursor: pointer; font-size: 10px; text-transform: uppercase; font-weight: bold; margin-top: 5px; text-align: left; }
+        .cart-total-section { border-top: 1px solid #333; padding-top: 20px; }
+        .total-row { display: flex; justify-content: space-between; font-weight: 700; font-size: 16px; text-transform: uppercase; margin-bottom: 20px; color: #fff; }
+
+        /* MODALLAR VE SİMÜLASYON */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+        .login-box { background: #121214; padding: 40px; width: 100%; max-width: 400px; border: 1px solid #333; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        
+        /* GİRİŞ ANİMASYONU EKRANI CSS YAPISI */
+        .sim-loader { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #0e0e10; border: 1px solid #00ff66; padding: 50px 40px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.1); }
+        .cyber-bar-container { width: 100%; height: 4px; background: #222; margin: 25px 0; position: relative; overflow: hidden; border-radius: 2px; }
+        .cyber-bar { width: 0%; height: 100%; background: #00ff66; box-shadow: 0 0 15px #00ff66; }
+        
+        /* GERÇEK DOSYA DOLUM ANİMASYONU */
+        @keyframes loadProgress { 
+            0% { width: 0%; } 
+            20% { width: 15%; } 
+            40% { width: 55%; } 
+            70% { width: 85%; } 
+            100% { width: 100%; } 
+        }
+        
+        .glow-text { animation: neonPulse 1s infinite alternate; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; color: #00ff66; }
+        @keyframes neonPulse { from { opacity: 0.5; filter: blur(0.5px); } to { opacity: 1; text-shadow: 0 0 10px #00ff66; } }
+
+        .tab-header { display: flex; margin-bottom: 30px; border-bottom: 1px solid #222; }
+        .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; cursor: pointer; color: #666; letter-spacing: 1px; }
+        .tab-btn.active { color: #00ff66; border-bottom: 2px solid #00ff66; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 10px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; color: #888; }
+        .form-group input, .form-group textarea { width: 100%; padding: 14px; border: 1px solid #333; background: #1e1e22; color: #fff; font-size: 13px; transition: all 0.2s; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #00ff66; outline: none; background: #25252b; }
+        
+        .btn { background: #fff; color: #000; border: 1px solid #fff; padding: 16px; font-size: 11px; font-weight: bold; text-transform: uppercase; cursor: pointer; width: 100%; text-align: center; letter-spacing: 2px; transition: all 0.2s; }
+        .btn:hover { background: #00ff66; border-color: #00ff66; color: #000; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #666; }
+        .close-modal:hover { color: #fff; }
+
+        /* ÜRÜN DETAY MODAL */
+        .detail-box { background: #121214; padding: 40px; width: 90%; max-width: 850px; max-height: 90vh; overflow-y: auto; border: 1px solid #333; position: relative; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; }
+        @media (max-width: 768px) { .detail-box { grid-template-columns: 1fr; gap: 20px; padding: 20px; } }
+        .detail-img-side { width: 100%; height: 450px; background-size: cover; background-position: center; background-color: #1e1e22; border: 1px solid #222; }
+        .detail-info-side { display: flex; flex-direction: column; justify-content: center; }
+
+        /* ANA İÇERİK */
+        .container { max-width: 1250px; margin: 40px auto; padding: 0 25px; }
+
+        /* ADMIN PANEL */
+        .admin-section { display: none; background: #121214; border: 1px solid #333; padding: 40px; margin-bottom: 60px; border-left: 4px solid #00ff66; }
+        .admin-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; }
+        @media (max-width: 768px) { .admin-grid { grid-template-columns: 1fr; } }
+        .admin-section h3 { font-size: 14px; text-transform: uppercase; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 10px; letter-spacing: 1px; color: #fff; }
+        .guest-log-list { max-height: 250px; overflow-y: auto; border: 1px solid #333; padding: 15px; background: #16161a; font-size: 12px; color: #aaa; }
+        .guest-log-item { padding: 8px 0; border-bottom: 1px dashed #222; }
+        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-input-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
+        .file-input-btn { border: 1px dashed #333; color: #aaa; background-color: #1e1e22; padding: 14px; font-size: 11px; font-weight: bold; text-transform: uppercase; display: block; text-align: center; cursor: pointer; }
+        .file-input-btn:hover { border-color: #00ff66; color: #fff; }
+
+        /* MAĞAZA GRİD */
+        .section-title { font-size: 20px; font-weight: 700; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 1px; color: #fff; border-bottom: 1px solid #222; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title::after { content: '// BATCH 2026'; font-size: 11px; color: #00ff66; font-weight: 400; letter-spacing: 2px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 35px; }
+        .product-card { background: #121214; border: 1px solid #222; padding: 16px; display: flex; flex-direction: column; position: relative; transition: all 0.3s ease; }
+        .product-card:hover { border-color: #00ff66; box-shadow: 0 10px 30px rgba(0, 255, 102, 0.03); }
+        
+        .product-image { width: 100%; height: 380px; background-color: #1e1e22; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #555; text-transform: uppercase; margin-bottom: 15px; cursor: pointer; filter: saturate(0.9); transition: filter 0.2s; }
+        .product-card:hover .product-image { filter: saturate(1); }
+        
+        .product-gallery { display: flex; gap: 8px; margin-bottom: 15px; }
+        .gallery-thumb { width: 45px; height: 45px; background-size: cover; background-position: center; border: 1px solid #333; cursor: pointer; }
+        .gallery-thumb.active { border-color: #00ff66; }
+        
+        .product-title { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; color: #fff; cursor: pointer; }
+        .product-title:hover { color: #00ff66; }
+        .product-desc { font-size: 12px; color: #888; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-price { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #fff; }
+        
+        .stock-indicator { font-size: 9px; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px; display: inline-block; padding: 2px 6px; background: #1e1e22; border-radius: 3px; }
+        .stock-in { color: #888; }
+        .stock-low { color: #00ff66; background: rgba(0, 255, 102, 0.1); }
+        .stock-out { color: #ff3b30; background: rgba(255, 59, 48, 0.1); }
+        
+        .action-btn { background-color: #fff; color: #000; border: 1px solid #fff; padding: 14px; text-align: center; font-weight: 700; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-top: auto; letter-spacing: 1px; }
+        .action-btn:hover:not(:disabled) { background-color: #00ff66; border-color: #00ff66; color: #000; }
+        .action-btn:disabled { background-color: #1e1e22; border-color: #333; color: #555; cursor: not-allowed; }
+        
+        .admin-controls { display: none; justify-content: space-between; margin-top: 15px; border-top: 1px solid #222; padding-top: 15px; }
+        body.admin-mode .admin-controls { display: flex; }
+        .admin-del-btn { background: none; color: #ff3b30; border: 1px solid #ff3b30; padding: 8px; font-size: 10px; text-transform: uppercase; font-weight: bold; cursor: pointer; flex-grow: 1; text-align: center; }
+        .admin-del-btn:hover { background: #ff3b30; color: #fff; }
+        
+        footer { text-align: center; padding: 60px 20px; margin-top: 100px; border-top: 1px solid #222; font-size: 10px; color: #555; letter-spacing: 2px; text-transform: uppercase; background: #121214; }
+    </style>
+</head>
+<body>
+
+    <!-- ÜST BAR -->
+    <header>
+        <div class="logo" onclick="location.reload()">MODEX<span>.</span></div>
+        <nav>
+            <div id="userProfile" class="user-profile">
+                <img id="userImg" class="user-img" src="" alt="Profil">
+                <span id="userName" class="user-name"></span>
+            </div>
+            <button class="nav-btn cart-btn" onclick="openCartWithAuthCheck()">SEPET // <span id="cartCount">0</span></button>
+            <button id="logoutNavBtn" class="nav-btn logout-btn" onclick="handleLogout()">Çıkış</button>
+        </nav>
+    </header>
+
+    <!-- SEPET PANELİ -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3 style="letter-spacing: 1px;">KARTINIZ</h3>
+            <span class="close-cart" onclick="toggleCart(false)">&times;</span>
+        </div>
+        <div id="cartItemsList" class="cart-items-list"></div>
+        <div class="cart-total-section">
+            <div class="total-row">
+                <span>TOPLAM:</span>
+                <span id="cartTotalText">0,00 TL</span>
+            </div>
+            <button class="btn" onclick="checkoutViaWhatsApp()" style="background-color: #00ff66; border-color: #00ff66; color: #000;">WHATSAPP İLE BİTİR</button>
+        </div>
+    </div>
+
+    <!-- GİRİŞ MODAL PENCERESİ VE ANİMASYON KATMANI -->
+    <div id="authModal" class="modal-overlay">
+        <!-- ANA GİRİŞ PENCERESİ -->
+        <div class="login-box" id="loginBoxContent">
+            <span class="close-modal" onclick="closeAuthModal()">&times;</span>
+            <div class="tab-header">
+                <button id="customerTab" class="tab-btn active" onclick="switchTab('customer')">Kullanıcı Girişi</button>
+                <button id="adminTab" class="tab-btn" onclick="switchTab('admin')">Yönetici Girişi</button>
+            </div>
+
+            <!-- MÜŞTERİ FORM ALANI -->
+            <div id="customerForm">
+                <div class="form-group">
+                    <label>Kullanıcı Adı veya Nick</label>
+                    <input type="text" id="customerNameInput" placeholder="Örn: taha_x">
+                </div>
+                <button class="btn" onclick="startLoginSimulation('customer')">BAĞLAN</button>
+            </div>
+
+            <!-- YÖNETİCİ FORM ALANI -->
+            <div id="adminForm" style="display: none;">
+                <div class="form-group">
+                    <label>Yönetici Kimliği</label>
+                    <input type="text" id="adminUsernameInput" placeholder="Kullanıcı adı">
+                </div>
+                <div class="form-group">
+                    <label>Erişim Anahtarı</label>
+                    <input type="password" id="adminPasswordInput" placeholder="Şifre">
+                </div>
+                <button class="btn" onclick="startLoginSimulation('admin')">KİMLİĞİ DOĞRULA</button>
+            </div>
+        </div>
+
+        <!-- YENİ DIŞARI ALINMIŞ SİBER ANİMASYON EKRANI -->
+        <div class="login-box sim-loader" id="simulationLoader">
+            <div class="glow-text">[ ACCESS GRANTED ]</div>
+            <div class="cyber-bar-container">
+                <div class="cyber-bar" id="cyberBarElement"></div>
+            </div>
+            <p style="font-size:10px; color:#666; letter-spacing:2px; text-transform:uppercase;">ESTABLISHING SECURE CONNECTION...</p>
+        </div>
+    </div>
+
+    <!-- ÜRÜN DETAY MODAL PENCERESİ -->
+    <div id="detailModal" class="modal-overlay">
+        <div class="detail-box">
+            <span class="close-modal" onclick="closeDetailModal()">&times;</span>
+            <div id="detailImage" class="detail-img-side"></div>
+            <div class="detail-info-side">
+                <h2 id="detailTitle" style="text-transform:uppercase; font-size:22px; margin-bottom:15px; color:#fff;">Ürün Başlığı</h2>
+                <p id="detailDesc" style="font-size:13px; color:#888; margin-bottom:25px; font-weight:300;">Ürün detay ve kumaş araştırma bilgisi.</p>
+                <div id="detailPrice" style="font-size:20px; font-weight:700; margin-bottom:30px; color:#00ff66;">0,00 TL</div>
+                <button id="detailActionBtn" class="btn">SEPETE EKLE</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- YÖNETİCİ PANELİ -->
+        <div id="adminSection" class="admin-section">
+            <div class="admin-grid">
+                <div>
+                    <h3>Ürün Enjeksiyonu (Fotoğraflı)</h3>
+                    <form id="productForm" onsubmit="addProduct(event)">
+                        <div class="form-group">
+                            <label>Ürün Adı</label>
+                            <input type="text" id="prodTitle" placeholder="MODEX Heavy Tee" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ürün Açıklaması</label>
+                            <textarea id="prodDesc" rows="2" placeholder="Kumaş gramajı, kesim detayları..." required></textarea>
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 20px;">
+                            <div style="flex: 1;">
+                                <label>Fiyat (TL)</label>
+                                <input type="number" id="prodPrice" placeholder="1500" required>
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Stok Adedi</label>
+                                <input type="number" id="prodStock" placeholder="10" required min="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Medya Dosyaları</label>
+                            <div class="file-input-wrapper">
+                                <span class="file-input-btn" id="fileLabel">Fotoğraf Ekle (Çoklu)</span>
+                                <input type="file" id="prodFiles" accept="image/*" multiple onchange="updateFileName()">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" style="background:#00ff66; border-color:#00ff66; color:#000;">VİTRİNE FIRLAT</button>
+                    </form>
+                </div>
+                <div>
+                    <h3>Müşteri Erişim Günlüğü</h3>
+                    <div id="guestLogList" class="guest-log-list"></div>
+                    <button class="btn" style="margin-top:15px; padding: 10px; font-size:10px; width: auto; background:#1e1e22; border-color:#333; color:#fff;" onclick="clearLogs()">TEMİZLE</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">DROP _01 / YENİ SEZON</div>
+        <div class="product-grid" id="productGrid"></div>
+    </div>
+
+    <footer>&copy; 2026 MODEX // LABS CORP.</footer>
+
+    <script>
+        // Şifre maskeleme yapıları (Base64 kodlama mantığı)
+        const tY = "dGFoYQ=="; 
+        const tP = "dGFoYTEyMw==";
+
+        const defaultProducts = [
+            { id: 1, title: "Modex Cyberpunk Boxy Tee", desc: "400 GSM ultra ağır pamuk, siber detay baskılı sokak kesim tişört.", price: 950, stock: 12, images: ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop"] },
+            { id: 2, title: "Modex Phantom Raw Hoodie", desc: "Eskitilmiş dikişli, yıkamalı antrasit gri oversize kalın kapüşonlu sweatshirt.", price: 1850, stock: 3, images: ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&auto=format&fit=crop"] }
+        ];
+        
+        let products = JSON.parse(localStorage.getItem('vx_products')) || defaultProducts;
+        let cart = [];
+        let currentTab = 'customer';
+        let pendingAction = null;
+
+        function switchTab(tab) {
+            currentTab = tab;
+            if(tab === 'customer') {
+                document.getElementById('customerTab').classList.add('active');
+                document.getElementById('adminTab').classList.remove('active');
+                document.getElementById('customerForm').style.display = 'block';
+                document.getElementById('adminForm').style.display = 'none';
+            } else {
+                document.getElementById('adminTab').classList.add('active');
+                document.getElementById('customerTab').classList.remove('active');
+                document.getElementById('adminForm').style.display = 'block';
+                document.getElementById('customerForm').style.display = 'none';
+            }
+        }
+
+        function showAuthModal(actionAfterLogin = null) {
+            pendingAction = actionAfterLogin;
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('loginBoxContent').style.display = 'block';
+            document.getElementById('simulationLoader').style.display = 'none';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+            pendingAction = null;
+        }
+
+        function openCartWithAuthCheck() {
+            if (!sessionStorage.getItem('currentUser')) { showAuthModal('openCart'); } 
+            else { toggleCart(true); }
+        }
+
+        // DÜZELTİLEN VE TETİKLENEN ANİMASYONLU GİRİŞ FONKSİYONU
+        function startLoginSimulation(type) {
+            if (type === 'customer') {
+                const name = document.getElementById('customerNameInput').value.trim();
+                if(!name) { alert("Bir takma ad girin!"); return; }
+                
+                triggerCyberAnimation(() => {
+                    const userData = { displayName: name, role: 'customer', photoURL: "https://img.icons8.com/ios-filled/50/ffffff/user-male-circle.png" };
+                    sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                    recordCustomerLog(name);
+                    applyLoginState(userData);
+                    finalizeLogin();
+                });
+            } else {
+                const user = document.getElementById('adminUsernameInput').value.trim();
+                const pass = document.getElementById('adminPasswordInput').value;
+                
+                if(window.btoa(user) === tY && window.btoa(pass) === tP) {
+                    triggerCyberAnimation(() => {
+                        const userData = { displayName: "TAHA (ADMIN)", role: 'admin', photoURL: "https://img.icons8.com/color/96/admin-settings-male.png" };
+                        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                        applyLoginState(userData);
+                        finalizeLogin();
+                    });
+                } else {
+                    alert("Erişim Reddedildi: Hatalı Kimlik Bilgileri!");
+                }
+            }
+        }
+
+        // Animasyon kutusunu görünür yapan ve css animasyonunu başlatan motor
+        function triggerCyberAnimation(callback) {
+            document.getElementById('loginBoxContent').style.display = 'none';
+            document.getElementById('simulationLoader').style.display = 'flex';
+            
+            const bar = document.getElementById('cyberBarElement');
+            bar.style.animation = 'none'; 
+            
+            // CSS Reflow tetikleme mekanizması
+            void bar.offsetWidth; 
+            
+            // Yükleme çubuğu animasyonu tetikleniyor
+            bar.style.animation = 'loadProgress 1.8s cubic-bezier(0.075, 0.82, 0.165, 1) forwards';
+
+            // Animasyon bittiğinde sisteme aktarma yapılıyor
+            setTimeout(callback, 1800);
+        }
+
+        function finalizeLogin() {
+            document.getElementById('authModal').style.display = 'none';
+            if (pendingAction === 'openCart') { toggleCart(true); } 
+            else if (pendingAction === 'whatsappCheckout') { toggleCart(true); checkoutViaWhatsApp(); }
+            pendingAction = null;
+        }
+
+        function applyLoginState(user) {
+            document.getElementById('logoutNavBtn').style.display = "block";
+            const profile = document.getElementById('userProfile');
+            profile.style.display = "flex";
+            document.getElementById('userImg').src = user.photoURL;
+            document.getElementById('userName').textContent = user.displayName;
+
+            if (user.role === 'admin') {
+                document.body.classList.add('admin-mode');
+                document.getElementById('adminSection').style.display = "block";
+                renderLogs();
+            } else {
+                document.body.classList.remove('admin-mode');
+                document.getElementById('adminSection').style.display = "none";
+            }
+            renderProducts();
+        }
+
+        function handleLogout() {
+            sessionStorage.clear();
+            document.body.classList.remove('admin-mode');
+            document.getElementById('adminSection').style.display = "none";
+            document.getElementById('userProfile').style.display = "none";
+            document.getElementById('logoutNavBtn').style.display = "none";
+            document.getElementById('customerNameInput').value = '';
+            document.getElementById('adminUsernameInput').value = '';
+            document.getElementById('adminPasswordInput').value = '';
+            cart = [];
+            updateCartCount();
+            renderProducts();
+        }
+
+        function openProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const firstImg = product.images && product.images.length > 0 ? product.images[0] : '';
+            const detailImgDiv = document.getElementById('detailImage');
+            
+            if(firstImg) { detailImgDiv.style.backgroundImage = `url('${firstImg}')`; }
+            else { detailImgDiv.style.backgroundImage = 'none'; detailImgDiv.innerHTML = '<span style="display:block; text-align:center; padding-top:200px; color:#444; font-size:11px;">MEDYA YOK</span>'; }
+
+            document.getElementById('detailTitle').textContent = product.title;
+            document.getElementById('detailDesc').textContent = product.desc || "Detaylı inceleme kaydı bulunmuyor.";
+            document.getElementById('detailPrice').textContent = product.price.toLocaleString('tr-TR') + " TL";
+
+            const btn = document.getElementById('detailActionBtn');
+            if(product.stock === 0) {
+                btn.textContent = "STOK DIŞI"; btn.disabled = true;
+            } else {
+                btn.textContent = "SEPETE FIRLAT"; btn.disabled = false;
+                btn.onclick = function() { addToCart(product.id); closeDetailModal(); };
+            }
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
+
+        function updateFileName() {
+            const fileInput = document.getElementById('prodFiles');
+            const label = document.getElementById('fileLabel');
+            label.textContent = fileInput.files.length > 0 ? `${fileInput.files.length} Görsel Seçildi` : "Fotoğraf Ekle (Çoklu)";
+        }
+
+        async function addProduct(event) {
+            event.preventDefault();
+            const title = document.getElementById('prodTitle').value;
+            const desc = document.getElementById('prodDesc').value;
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const stock = parseInt(document.getElementById('prodStock').value);
+            const fileInput = document.getElementById('prodFiles');
+            let imagesArray = [];
+
+            if (fileInput.files.length > 0) {
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const base64 = await convertToBase64(fileInput.files[i]);
+                    imagesArray.push(base64);
+                }
+            }
+
+            products.push({ id: Date.now(), title, desc, price, stock, images: imagesArray });
+            localStorage.setItem('vx_products', JSON.stringify(products));
+            renderProducts();
+            document.getElementById('productForm').reset();
+            document.getElementById('fileLabel').textContent = "Fotoğraf Ekle (Çoklu)";
+        }
+
+        function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function deleteProduct(id) {
+            if(confirm("Bu drop parçasını silmek istiyor musun?")) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('vx_products', JSON.stringify(products));
+                renderProducts();
+            }
+        }
+
+        function changeMainImage(productId, imageUrl, element, event) {
+            event.stopPropagation();
+            const mainImgDiv = document.getElementById(`main-img-${productId}`);
+            if (mainImgDiv) { mainImgDiv.style.backgroundImage = `url('${imageUrl}')`; }
+            const thumbs = document.querySelectorAll(`.thumb-${productId}`);
+            thumbs.forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function toggleCart(show) {
+            const sidebar = document.getElementById('cartSidebar');
+            if (show) { sidebar.classList.add('open'); renderCart(); }
+            else { sidebar.classList.remove('open'); }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            const existing = cart.find(item => item.id === productId);
+            const currentQuantity = existing ? existing.quantity : 0;
+
+            if (product.stock <= currentQuantity) { alert("Stok tükenmiş veya sınırda."); return; }
+            if (existing) { existing.quantity += 1; } else { cart.push({ ...product, quantity: 1 }); }
+            updateCartCount();
+        }
+
+        function updateCartCount() { document.getElementById('cartCount').textContent = cart.reduce((total, item) => total + item.quantity, 0); }
+
+        function renderCart() {
+            const list = document.getElementById('cartItemsList');
+            const totalText = document.getElementById('cartTotalText');
+            list.innerHTML = '';
+            if (cart.length === 0) {
+                list.innerHTML = '<div style="color:#555; text-align:center; padding-top:40px; font-size:12px;">KARTINIZ BOŞ.</div>';
+                totalText.textContent = "0,00 TL"; return;
+            }
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity; total += itemTotal;
+                const row = document.createElement('div');
+                row.className = 'cart-item';
+                row.innerHTML = `
+                    <div class="cart-item-info">
+                        <strong>${item.title}</strong>
+                        <span style="color:#888;">${item.quantity} x ${item.price.toLocaleString('tr-TR')} TL</span>
+                        <button class="remove-item-btn" onclick="removeFromCart(${item.id})">[ KALDIR ]</button>
+                    </div>
+                    <div>${itemTotal.toLocaleString('tr-TR')} TL</div>
+                `;
+                list.appendChild(row);
+            });
+            totalText.textContent = total.toLocaleString('tr-TR') + " TL";
+        }
+
+        function removeFromCart(productId) {
+            const existing = cart.find(item => item.id === productId);
+            if(existing) {
+                if(existing.quantity > 1) { existing.quantity -= 1; }
+                else { cart = cart.filter(item => item.id !== productId); }
+            }
+            updateCartCount();
+            renderCart();
+        }
+
+        function checkoutViaWhatsApp() {
+            if (!sessionStorage.getItem('currentUser')) { toggleCart(false); showAuthModal('whatsappCheckout'); return; }
+            if (cart.length === 0) { alert("Sepetiniz boş!"); return; }
+            
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            let message = `*MODEX ONLINE ORDER*\n\nMüşteri: ${user.displayName}\n\n`;
+            let total = 0;
+            
+            cart.forEach(item => {
+                message += `• ${item.quantity} adet - ${item.title} (${item.price * item.quantity} TL)\n`;
+                total += item.price * item.quantity;
+            });
+            
+            message += `\n*TOPLAM TUTAR:* ${total} TL\nSiparişi onaylıyorum.`;
+            const encoded = encodeURIComponent(message);
+            window.open(`https://wa.me/905000000000?text=${encoded}`, '_blank');
+        }
+
+        function recordCustomerLog(name) {
+            let logs = JSON.parse(localStorage.getItem('vx_guest_logs')) || [];
+            const timeString = new Date().toLocaleString('tr-TR');
+            logs.unshift(`${timeString} -> Müşteri: [ ${name} ] sisteme giriş yaptı.`);
+            localStorage.setItem('vx_guest_logs', JSON.stringify(logs));
+        }
+
+        function renderLogs() {
+            const list = document.getElementById('guestLogList');
+            if(!list) return;
+            let logs = JSON.parse(localStorage.getItem('vx_guest_logs')) || [];
+            list.innerHTML = logs.length === 0 ? '<div style="color:#444;">Kayıt bulunmuyor.</div>' : logs.map(l => `<div class="guest-log-item">${l}</div>`).join('');
+        }
+
+        function clearLogs() {
+            if(confirm("Tüm logları silmek istiyor musun?")) {
+                localStorage.removeItem('vx_guest_logs');
+                renderLogs();
+            }
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                const hasImages = p.images && p.images.length > 0;
+                const mainImg = hasImages ? p.images[0] : '';
+                
+                let stockClass = 'stock-in';
+                let stockText = `STOK: ${p.stock} ADET`;
+                if(p.stock === 0) { stockClass = 'stock-out'; stockText = 'STOK TÜKENDİ'; }
+                else if(p.stock <= 5) { stockClass = 'stock-low'; stockText = `SON ${p.stock} PARÇA`; }
+
+                let thumbsHtml = '';
+                if(hasImages && p.images.length > 1) {
+                    thumbsHtml = `<div class="product-gallery">`;
+                    p.images.forEach((img, idx) => {
+                        thumbsHtml += `<div class="gallery-thumb thumb-${p.id} ${idx===0?'active':''}" style="background-image:url('${img}')" onclick="changeMainImage(${p.id}, '${img}', this, event)"></div>`;
+                    });
+                    thumbsHtml += `</div>`;
+                }
+
+                let imgStyle = mainImg ? `background-image: url('${mainImg}')` : '';
+                
+                card.innerHTML = `
+                    <div class="product-image" id="main-img-${p.id}" style="${imgStyle}" onclick="openProductDetail(${p.id})">
+                        ${!mainImg ? 'GÖRSEL ENJEKTE EDİLMEDİ' : ''}
+                    </div>
+                    ${thumbsHtml}
+                    <div class="product-title" onclick="openProductDetail(${p.id})">${p.title}</div>
+                    <div class="product-desc">${p.desc || ''}</div>
+                    <div class="product-price">${p.price.toLocaleString('tr-TR')} TL</div>
+                    <div>
+                        <span class="stock-indicator ${stockClass}">${stockText}</span>
+                    </div>
+                    <button class="action-btn" ${p.stock===0?'disabled':''} onclick="addToCart(${p.id})">
+                        ${p.stock===0?'OUT OF STOCK':'SEPETE FIRLAT'}
+                    </button>
+                    <div class="admin-controls">
+                        <button class="admin-del-btn" onclick="deleteProduct(${p.id})">PARÇAYI SİL</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.onload = function() {
+            const user = sessionStorage.getItem('currentUser');
+            if (user) { applyLoginState(JSON.parse(user)); } 
+            else { renderProducts(); }
+        }
+    </script>
+</body>
+</html>
