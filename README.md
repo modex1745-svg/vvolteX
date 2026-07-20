@@ -1,796 +1,637 @@
 <!DOCTYPE html>
-<html lang="tr" class="scroll-smooth">
+<html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>modeX | Sokak Modasının Yeni Boyutu</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome İkonları -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    .glass {
-      background: rgba(11, 15, 25, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    @keyframes pulse-neon {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6)); }
-      50% { transform: scale(1.08); filter: drop-shadow(0 0 35px rgba(6, 182, 212, 0.8)); }
-    }
-    .neon-pulse { animation: pulse-neon 2s infinite ease-in-out; }
-  </style>
-</head>
-<body class="bg-[#070a13] text-gray-100 min-h-screen font-sans overflow-hidden">
-
-  <!-- ================= ANİMASYONLU YÜKLEME EKRANI (SPLASH) ================= -->
-  <div id="splashScreen" class="fixed inset-0 bg-[#070a13] z-[9999] flex flex-col items-center justify-center transition-all duration-1000 ease-in-out">
-    <div class="text-center">
-      <h1 class="text-6xl md:text-8xl font-black tracking-widest bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 bg-clip-text text-transparent neon-pulse">
-        modeX
-      </h1>
-      <p class="text-gray-500 tracking-[0.3em] uppercase text-xs md:text-sm mt-6 animate-pulse">Tarz Yükleniyor...</p>
-    </div>
-  </div>
-
-  <!-- ================= MÜŞTERİ GİRİŞ MODAL ================= -->
-  <div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[9999] hidden flex items-center justify-center p-4">
-    <div class="glass w-full max-w-md p-8 rounded-3xl text-center relative z-10 space-y-5">
-      <div class="flex justify-between items-center">
-        <h2 class="text-3xl font-black tracking-widest bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 bg-clip-text text-transparent">modeX</h2>
-        <button onclick="closeAuthModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-      </div>
-      <p class="text-gray-400 text-sm">Siparişinizi güvenle ve hızlıca WhatsApp üzerinden tamamlamak için giriş yapın.</p>
-      
-      <!-- Kullanıcı Giriş Formu -->
-      <div class="space-y-4 text-left pt-2">
-        <div>
-          <label class="block text-xs font-bold tracking-widest text-gray-500 mb-1.5 uppercase">Kullanıcı Adı</label>
-          <input type="text" id="customerUserInput" placeholder="Adınız veya kullanıcı adınız" class="w-full bg-[#121829] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 text-sm">
-        </div>
-        <div>
-          <label class="block text-xs font-bold tracking-widest text-gray-500 mb-1.5 uppercase">Şifre</label>
-          <input type="password" id="customerPasswordInput" placeholder="••••••••" class="w-full bg-[#121829] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 text-sm">
-        </div>
-        
-        <button onclick="loginWithForm()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 rounded-xl font-bold hover:opacity-90 transition mt-2 text-sm shadow-lg shadow-purple-500/10">
-          Giriş Yap ve Devam Et
-        </button>
-      </div>
-
-      <div class="relative flex py-2 items-center">
-        <div class="flex-grow border-t border-gray-800"></div>
-        <span class="flex-shrink mx-4 text-gray-500 text-xs uppercase font-bold tracking-wider">Veya</span>
-        <div class="flex-grow border-t border-gray-800"></div>
-      </div>
-
-      <!-- Misafir Girişi -->
-      <button onclick="loginAsGuest()" class="w-full py-3.5 px-4 rounded-xl bg-[#121829] border border-gray-800 hover:border-cyan-400 text-sm font-bold transition flex items-center justify-center gap-2">
-        <i class="fas fa-user-secret text-cyan-400"></i> Misafir Olarak Giriş Yap
-      </button>
-    </div>
-  </div>
-
-  <!-- ================= ANA İÇERİK ================= -->
-  <div id="mainContent">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOLTERX // Streetwear & Vision</title>
     
-    <!-- ================= ÜST MENÜ ================= -->
-    <header class="fixed top-0 left-0 w-full z-50 glass transition-all duration-500" id="mainHeader">
-      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <h1 onclick="window.location.hash=''" class="text-3xl font-extrabold tracking-widest bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 bg-clip-text text-transparent cursor-pointer">
-          modeX
-        </h1>
-        <div class="flex items-center gap-3">
-          <!-- Giriş Butonları Grubu -->
-          <div id="guestLoginGroup" class="flex items-center gap-2">
-            <!-- Üst Menü Hızlı Misafir Giriş Butonu -->
-            <button onclick="loginAsGuest()" class="text-xs bg-cyan-500/10 hover:bg-cyan-500 border border-cyan-500/30 text-cyan-400 hover:text-[#070a13] px-3 py-2 rounded-xl transition font-bold">
-              <i class="fas fa-user-secret mr-1"></i> Misafir Girişi
-            </button>
-            <!-- Yönetici Hızlı Erişim Butonu -->
-            <button id="adminHeaderTrigger" onclick="openAdminModal()" class="text-xs bg-purple-600/10 hover:bg-purple-600 border border-purple-500/30 text-purple-400 hover:text-white px-3 py-2 rounded-xl transition font-semibold">
-              <i class="fas fa-user-shield mr-1"></i> Yönetici Girişi
-            </button>
-          </div>
-          
-          <button id="adminReturnBtn" onclick="document.getElementById('adminPanel').classList.remove('hidden')" class="hidden text-xs bg-pink-600/20 hover:bg-pink-600 border border-pink-500 text-pink-400 hover:text-white px-3 py-2 rounded-xl transition font-bold">
-            <i class="fas fa-tools mr-1"></i> Panele Dön
-          </button>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-          <!-- Müşteri Durumu -->
-          <span id="userBadge" class="hidden text-xs font-semibold bg-[#121829] border border-gray-800 px-4 py-2 rounded-full text-purple-400 flex items-center gap-2"></span>
-          <button id="logoutBtn" onclick="logoutCustomer()" class="hidden text-xs text-red-500 hover:text-red-400 font-bold transition">Çıkış</button>
-          
-          <!-- Sepet Butonu -->
-          <button onclick="toggleCart()" class="relative p-3 rounded-full bg-[#121829] border border-gray-800 hover:border-cyan-400 transition">
-            <i class="fas fa-shopping-cart text-lg text-cyan-400"></i>
-            <span id="cartCount" class="absolute -top-1 -right-1 w-5 h-5 bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
-          </button>
-        </div>
-      </div>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+        body { background-color: #0e0e10; color: #f5f5f7; line-height: 1.6; }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0e0e10; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00ff66; }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding: 25px 5%; border-bottom: 1px solid #222; position: sticky; top: 0; background: rgba(14, 14, 16, 0.9); backdrop-filter: blur(12px); z-index: 100; }
+        .logo { font-size: 26px; font-weight: 700; letter-spacing: -1px; text-transform: uppercase; cursor: pointer; color: #fff; position: relative; }
+        .logo span { color: #00ff66; }
+        nav { display: flex; align-items: center; gap: 20px; }
+        
+        .user-profile { display: none; align-items: center; gap: 10px; background: #1e1e22; padding: 6px 14px; border: 1px solid #333; border-radius: 30px; }
+        .user-img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; filter: grayscale(1); }
+        .user-name { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #00ff66; }
+        
+        .nav-btn { background: none; border: 1px solid #333; color: #fff; padding: 10px 24px; font-size: 11px; font-weight: 600; text-transform: uppercase; cursor: pointer; letter-spacing: 1px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-btn:hover { border-color: #00ff66; color: #00ff66; background: rgba(0, 255, 102, 0.05); }
+        .cart-btn { background: #fff; color: #000; border-color: #fff; font-weight: 700; }
+        .cart-btn:hover { background: #00ff66; border-color: #00ff66; color: #000; }
+        .logout-btn { display: none; border-color: #ff3b30; color: #ff3b30; }
+        .logout-btn:hover { background: #ff3b30; color: #fff; border-color: #ff3b30; }
+
+        /* SEPET SLIDER */
+        .cart-sidebar { position: fixed; top: 0; right: -450px; width: 100%; max-width: 420px; height: 100%; background: #121214; border-left: 1px solid #222; z-index: 200; transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; padding: 40px 30px; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 25px; }
+        .cart-header h3 { text-transform: uppercase; font-size: 16px; letter-spacing: 1px; font-weight: 700; }
+        .close-cart { font-size: 28px; cursor: pointer; font-weight: 300; color: #888; }
+        .close-cart:hover { color: #fff; }
+        .cart-items-list { flex-grow: 1; overflow-y: auto; margin-bottom: 25px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #333; font-size: 13px; }
+        .cart-item-info { display: flex; flex-direction: column; }
+        .remove-item-btn { background: none; border: none; color: #ff3b30; cursor: pointer; font-size: 10px; text-transform: uppercase; font-weight: bold; margin-top: 5px; text-align: left; }
+        .cart-total-section { border-top: 1px solid #333; padding-top: 20px; }
+        .total-row { display: flex; justify-content: space-between; font-weight: 700; font-size: 16px; text-transform: uppercase; margin-bottom: 20px; color: #fff; }
+
+        /* MODALLAR VE SİMÜLASYON */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+        .login-box { background: #121214; padding: 40px; width: 100%; max-width: 400px; border: 1px solid #333; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        
+        /* GİRİŞ ANİMASYONU EKRANI CSS YAPISI */
+        .sim-loader { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: #0e0e10; border: 1px solid #00ff66; padding: 50px 40px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.1); }
+        .cyber-bar-container { width: 100%; height: 4px; background: #222; margin: 25px 0; position: relative; overflow: hidden; border-radius: 2px; }
+        .cyber-bar { width: 0%; height: 100%; background: #00ff66; box-shadow: 0 0 15px #00ff66; }
+        
+        /* GERÇEK DOSYA DOLUM ANİMASYONU */
+        @keyframes loadProgress { 
+            0% { width: 0%; } 
+            20% { width: 15%; } 
+            40% { width: 55%; } 
+            70% { width: 85%; } 
+            100% { width: 100%; } 
+        }
+        
+        .glow-text { animation: neonPulse 1s infinite alternate; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; color: #00ff66; }
+        @keyframes neonPulse { from { opacity: 0.5; filter: blur(0.5px); } to { opacity: 1; text-shadow: 0 0 10px #00ff66; } }
+
+        .tab-header { display: flex; margin-bottom: 30px; border-bottom: 1px solid #222; }
+        .tab-btn { flex: 1; background: none; border: none; padding: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; cursor: pointer; color: #666; letter-spacing: 1px; }
+        .tab-btn.active { color: #00ff66; border-bottom: 2px solid #00ff66; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 10px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; color: #888; }
+        .form-group input, .form-group textarea { width: 100%; padding: 14px; border: 1px solid #333; background: #1e1e22; color: #fff; font-size: 13px; transition: all 0.2s; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #00ff66; outline: none; background: #25252b; }
+        
+        .btn { background: #fff; color: #000; border: 1px solid #fff; padding: 16px; font-size: 11px; font-weight: bold; text-transform: uppercase; cursor: pointer; width: 100%; text-align: center; letter-spacing: 2px; transition: all 0.2s; }
+        .btn:hover { background: #00ff66; border-color: #00ff66; color: #000; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #666; }
+        .close-modal:hover { color: #fff; }
+
+        /* ÜRÜN DETAY MODAL */
+        .detail-box { background: #121214; padding: 40px; width: 90%; max-width: 850px; max-height: 90vh; overflow-y: auto; border: 1px solid #333; position: relative; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; }
+        @media (max-width: 768px) { .detail-box { grid-template-columns: 1fr; gap: 20px; padding: 20px; } }
+        .detail-img-side { width: 100%; height: 450px; background-size: cover; background-position: center; background-color: #1e1e22; border: 1px solid #222; }
+        .detail-info-side { display: flex; flex-direction: column; justify-content: center; }
+
+        /* ANA İÇERİK */
+        .container { max-width: 1250px; margin: 40px auto; padding: 0 25px; }
+
+        /* ADMIN PANEL */
+        .admin-section { display: none; background: #121214; border: 1px solid #333; padding: 40px; margin-bottom: 60px; border-left: 4px solid #00ff66; }
+        .admin-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; }
+        @media (max-width: 768px) { .admin-grid { grid-template-columns: 1fr; } }
+        .admin-section h3 { font-size: 14px; text-transform: uppercase; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 10px; letter-spacing: 1px; color: #fff; }
+        .guest-log-list { max-height: 250px; overflow-y: auto; border: 1px solid #333; padding: 15px; background: #16161a; font-size: 12px; color: #aaa; }
+        .guest-log-item { padding: 8px 0; border-bottom: 1px dashed #222; }
+        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+        .file-input-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
+        .file-input-btn { border: 1px dashed #333; color: #aaa; background-color: #1e1e22; padding: 14px; font-size: 11px; font-weight: bold; text-transform: uppercase; display: block; text-align: center; cursor: pointer; }
+        .file-input-btn:hover { border-color: #00ff66; color: #fff; }
+
+        /* MAĞAZA GRİD */
+        .section-title { font-size: 20px; font-weight: 700; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 1px; color: #fff; border-bottom: 1px solid #222; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title::after { content: '// BATCH 2026'; font-size: 11px; color: #00ff66; font-weight: 400; letter-spacing: 2px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 35px; }
+        .product-card { background: #121214; border: 1px solid #222; padding: 16px; display: flex; flex-direction: column; position: relative; transition: all 0.3s ease; }
+        .product-card:hover { border-color: #00ff66; box-shadow: 0 10px 30px rgba(0, 255, 102, 0.03); }
+        
+        .product-image { width: 100%; height: 380px; background-color: #1e1e22; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #555; text-transform: uppercase; margin-bottom: 15px; cursor: pointer; filter: saturate(0.9); transition: filter 0.2s; }
+        .product-card:hover .product-image { filter: saturate(1); }
+        
+        .product-gallery { display: flex; gap: 8px; margin-bottom: 15px; }
+        .gallery-thumb { width: 45px; height: 45px; background-size: cover; background-position: center; border: 1px solid #333; cursor: pointer; }
+        .gallery-thumb.active { border-color: #00ff66; }
+        
+        .product-title { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; color: #fff; cursor: pointer; }
+        .product-title:hover { color: #00ff66; }
+        .product-desc { font-size: 12px; color: #888; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-price { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #fff; }
+        
+        .stock-indicator { font-size: 9px; text-transform: uppercase; font-weight: 700; margin-bottom: 15px; letter-spacing: 1px; display: inline-block; padding: 2px 6px; background: #1e1e22; border-radius: 3px; }
+        .stock-in { color: #888; }
+        .stock-low { color: #00ff66; background: rgba(0, 255, 102, 0.1); }
+        .stock-out { color: #ff3b30; background: rgba(255, 59, 48, 0.1); }
+        
+        .action-btn { background-color: #fff; color: #000; border: 1px solid #fff; padding: 14px; text-align: center; font-weight: 700; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-top: auto; letter-spacing: 1px; }
+        .action-btn:hover:not(:disabled) { background-color: #00ff66; border-color: #00ff66; color: #000; }
+        .action-btn:disabled { background-color: #1e1e22; border-color: #333; color: #555; cursor: not-allowed; }
+        
+        .admin-controls { display: none; justify-content: space-between; margin-top: 15px; border-top: 1px solid #222; padding-top: 15px; }
+        body.admin-mode .admin-controls { display: flex; }
+        .admin-del-btn { background: none; color: #ff3b30; border: 1px solid #ff3b30; padding: 8px; font-size: 10px; text-transform: uppercase; font-weight: bold; cursor: pointer; flex-grow: 1; text-align: center; }
+        .admin-del-btn:hover { background: #ff3b30; color: #fff; }
+        
+        footer { text-align: center; padding: 60px 20px; margin-top: 100px; border-top: 1px solid #222; font-size: 10px; color: #555; letter-spacing: 2px; text-transform: uppercase; background: #121214; }
+    </style>
+</head>
+<body>
+
+    <!-- ÜST BAR -->
+    <header>
+        <div class="logo" onclick="location.reload()">VOLTERX<span>.</span></div>
+        <nav>
+            <div id="userProfile" class="user-profile">
+                <img id="userImg" class="user-img" src="" alt="Profil">
+                <span id="userName" class="user-name"></span>
+            </div>
+            <button class="nav-btn cart-btn" onclick="openCartWithAuthCheck()">SEPET // <span id="cartCount">0</span></button>
+            <button id="logoutNavBtn" class="nav-btn logout-btn" onclick="handleLogout()">Çıkış</button>
+        </nav>
     </header>
 
-    <!-- ================= KAHRAMAN BÖLÜMÜ ================= -->
-    <main class="relative pt-40 pb-20 flex flex-col items-center justify-center text-center px-4 overflow-hidden min-h-screen">
-      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full filter blur-[120px]"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full filter blur-[120px]"></div>
-
-      <div class="transition-all duration-1000" id="heroContent">
-        <span class="text-cyan-400 text-sm font-bold tracking-widest uppercase mb-3 block">Sınırları Zorla</span>
-        <h2 class="text-5xl md:text-8xl font-black tracking-tight mb-6 leading-none uppercase">
-          TARZINI <br/>
-          <span class="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">YENİDEN TANIMLA</span>
-        </h2>
-        <p class="text-gray-400 max-w-xl text-base md:text-lg mb-8 mx-auto">
-          Koleksiyonu özgürce keşfet, sepetini doldur ve tek tıkla WhatsApp üzerinden siparişini tamamla! 🚀
-        </p>
-        <a href="#products" class="inline-block px-8 py-4 rounded-full bg-cyan-400 text-[#070a13] font-bold text-lg hover:bg-cyan-300 hover:scale-105 transition shadow-lg shadow-cyan-500/20">
-          Koleksiyonu Keşfet 🔥
-        </a>
-      </div>
-    </main>
-
-    <!-- ================= VİTRİN BÖLÜMÜ ================= -->
-    <section id="products" class="max-w-7xl mx-auto px-6 py-20">
-      <div class="mb-12">
-        <h3 class="text-3xl font-black tracking-wider text-purple-400">Vitrin</h3>
-        <p class="text-gray-500 text-sm">Gerçek zamanlı modeX koleksiyonu</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="productGrid"></div>
-    </section>
-
-    <!-- ================= SEPET PANELİ ================= -->
-    <div id="cartPanel" class="fixed top-0 right-0 h-full w-full md:w-96 glass z-[1000] translate-x-full transition-transform duration-500 flex flex-col">
-      <div class="p-6 bg-black/30 border-b border-gray-800 flex justify-between items-center">
-        <h3 class="text-xl font-bold text-cyan-400">Sepetim</h3>
-        <button onclick="toggleCart()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-      </div>
-      <div id="cartList" class="flex-1 p-6 overflow-y-auto space-y-4"></div>
-      <div class="p-6 border-t border-gray-800 bg-[#070a13]">
-        <div class="flex justify-between items-center mb-6">
-          <span class="text-gray-400 font-bold">Toplam Tutar:</span>
-          <span id="cartTotal" class="text-2xl font-black text-cyan-400">0 TL</span>
+    <!-- SEPET PANELİ -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3 style="letter-spacing: 1px;">KARTINIZ</h3>
+            <span class="close-cart" onclick="toggleCart(false)">&times;</span>
         </div>
-        <button onclick="processOrderCheckout()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold rounded-2xl transition flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/20">
-          WhatsApp İle Siparişi Gönder <i class="fab fa-whatsapp text-xl"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- ================= DETAYLI ÜRÜN MODALI ================= -->
-    <div id="productDetailModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[999] hidden flex items-center justify-center p-4">
-      <div class="glass w-full max-w-4xl rounded-3xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        <div class="p-6 flex flex-col justify-between bg-black/25">
-          <div class="relative aspect-square rounded-2xl overflow-hidden bg-gray-900 flex items-center justify-center">
-            <img id="detailMainImg" src="" class="w-full h-full object-cover">
-          </div>
-          <div id="detailThumbnails" class="flex gap-2 mt-4 overflow-x-auto py-2"></div>
-        </div>
-        <div class="p-8 flex flex-col justify-between">
-          <div>
-            <div class="flex justify-between items-start mb-6">
-              <h4 id="detailTitle" class="text-3xl font-black tracking-tight">Ürün Adı</h4>
-              <button onclick="closeProductDetail()" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+        <div id="cartItemsList" class="cart-items-list"></div>
+        <div class="cart-total-section">
+            <div class="total-row">
+                <span>TOPLAM:</span>
+                <span id="cartTotalText">0,00 TL</span>
             </div>
-            <p id="detailDesc" class="text-gray-400 text-sm leading-relaxed mb-4"></p>
-            <p id="detailStockStatus" class="text-sm font-semibold mb-6"></p>
-            <div id="detailLinkBox" class="bg-[#121829] p-3 rounded-xl border border-gray-800 mb-6 flex justify-between items-center text-xs">
-              <span class="text-cyan-400 truncate mr-2" id="detailShareLink">Link</span>
-              <button onclick="copyProductLink()" class="px-3 py-1 bg-purple-600 rounded-lg hover:bg-purple-500 font-bold">Kopyala</button>
+            <button class="btn" onclick="checkoutViaWhatsApp()" style="background-color: #00ff66; border-color: #00ff66; color: #000;">WHATSAPP İLE BİTİR</button>
+        </div>
+    </div>
+
+    <!-- GİRİŞ MODAL PENCERESİ VE ANİMASYON KATMANI -->
+    <div id="authModal" class="modal-overlay">
+        <!-- ANA GİRİŞ PENCERESİ -->
+        <div class="login-box" id="loginBoxContent">
+            <span class="close-modal" onclick="closeAuthModal()">&times;</span>
+            <div class="tab-header">
+                <button id="customerTab" class="tab-btn active" onclick="switchTab('customer')">Kullanıcı Girişi</button>
+                <button id="adminTab" class="tab-btn" onclick="switchTab('admin')">Yönetici Girişi</button>
             </div>
-          </div>
-          <div class="flex items-center justify-between gap-4 mt-6">
-            <span id="detailPrice" class="text-3xl font-black text-cyan-400">0 TL</span>
-            <div class="flex gap-2">
-              <button id="detailAddBtn" class="px-5 py-3 bg-[#121829] hover:bg-purple-600/20 border border-purple-500/30 text-white font-bold rounded-2xl transition text-sm">
-                Sepete Ekle 🛒
-              </button>
-              <button id="detailDirectBuyBtn" class="px-5 py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold rounded-2xl transition text-sm flex items-center gap-1">
-                Hemen Al <i class="fab fa-whatsapp"></i>
-              </button>
+
+            <!-- MÜŞTERİ FORM ALANI -->
+            <div id="customerForm">
+                <div class="form-group">
+                    <label>Kullanıcı Adı veya Nick</label>
+                    <input type="text" id="customerNameInput" placeholder="Örn: taha_x">
+                </div>
+                <button class="btn" onclick="startLoginSimulation('customer')">BAĞLAN</button>
             </div>
-          </div>
+
+            <!-- YÖNETİCİ FORM ALANI -->
+            <div id="adminForm" style="display: none;">
+                <div class="form-group">
+                    <label>Yönetici Kimliği</label>
+                    <input type="text" id="adminUsernameInput" placeholder="Kullanıcı adı">
+                </div>
+                <div class="form-group">
+                    <label>Erişim Anahtarı</label>
+                    <input type="password" id="adminPasswordInput" placeholder="Şifre">
+                </div>
+                <button class="btn" onclick="startLoginSimulation('admin')">KİMLİĞİ DOĞRULA</button>
+            </div>
         </div>
-      </div>
+
+        <!-- SİBER ANİMASYON EKRANI -->
+        <div class="login-box sim-loader" id="simulationLoader">
+            <div class="glow-text">[ ACCESS GRANTED ]</div>
+            <div class="cyber-bar-container">
+                <div class="cyber-bar" id="cyberBarElement"></div>
+            </div>
+            <p style="font-size:10px; color:#666; letter-spacing:2px; text-transform:uppercase;">ESTABLISHING SECURE CONNECTION...</p>
+        </div>
     </div>
 
-    <footer class="text-center py-12 border-t border-gray-900 mt-20 text-gray-600 text-sm">
-      <p>&copy; 2026 modeX. Tüm Hakları Saklıdır. 🔥</p>
-    </footer>
-  </div>
-
-  <!-- ================= AYRI YÖNETİCİ GİRİŞ MODALI ================= -->
-  <div id="adminModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-4">
-    <div class="glass w-full max-w-sm p-8 rounded-3xl">
-      <div class="flex justify-between items-center mb-6">
-        <h4 class="text-2xl font-black tracking-wider text-purple-400 font-mono">Yönetici Paneli</h4>
-        <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-      </div>
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold tracking-widest text-gray-500 mb-2 uppercase">Kullanıcı Adı</label>
-          <input type="text" id="adminUserInput" class="w-full bg-[#121829] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 text-sm">
+    <!-- ÜRÜN DETAY MODAL PENCERESİ -->
+    <div id="detailModal" class="modal-overlay">
+        <div class="detail-box">
+            <span class="close-modal" onclick="closeDetailModal()">&times;</span>
+            <div id="detailImage" class="detail-img-side"></div>
+            <div class="detail-info-side">
+                <h2 id="detailTitle" style="text-transform:uppercase; font-size:22px; margin-bottom:15px; color:#fff;">Ürün Başlığı</h2>
+                <p id="detailDesc" style="font-size:13px; color:#888; margin-bottom:25px; font-weight:300;">Ürün detay ve kumaş araştırma bilgisi.</p>
+                <div id="detailPrice" style="font-size:20px; font-weight:700; margin-bottom:30px; color:#00ff66;">0,00 TL</div>
+                <button id="detailActionBtn" class="btn">SEPETE EKLE</button>
+            </div>
         </div>
-        <div>
-          <label class="block text-xs font-bold tracking-widest text-gray-500 mb-2 uppercase">Şifre</label>
-          <input type="password" id="adminPasswordInput" class="w-full bg-[#121829] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500 text-sm">
-        </div>
-        <button onclick="loginAdminEncrypted()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold hover:opacity-90 transition mt-4">
-          Güvenli Giriş Yap
-        </button>
-      </div>
     </div>
-  </div>
 
-  <!-- ================= KONTROL PANELİ ================= -->
-  <div id="adminPanel" class="fixed inset-0 bg-[#070a13] z-[9999] hidden overflow-y-auto p-6">
-    <div class="max-w-6xl mx-auto mt-20">
-      <div class="flex justify-between items-center mb-12">
-        <h2 class="text-3xl font-extrabold text-purple-400">Yönetici Kontrol Paneli</h2>
-        <div class="flex items-center gap-3">
-          <button onclick="document.getElementById('adminPanel').classList.add('hidden')" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-xl font-bold transition">Siteyi Gör</button>
-          <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition">Çıkış Yap</button>
+    <div class="container">
+        <!-- YÖNETİCİ PANELİ -->
+        <div id="adminSection" class="admin-section">
+            <div class="admin-grid">
+                <div>
+                    <h3>Ürün Enjeksiyonu (Fotoğraflı)</h3>
+                    <form id="productForm" onsubmit="addProduct(event)">
+                        <div class="form-group">
+                            <label>Ürün Adı</label>
+                            <input type="text" id="prodTitle" placeholder="VOLTERX Heavy Tee" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ürün Açıklaması</label>
+                            <textarea id="prodDesc" rows="2" placeholder="Kumaş gramajı, kesim detayları..." required></textarea>
+                        </div>
+                        <div class="form-group" style="display: flex; gap: 20px;">
+                            <div style="flex: 1;">
+                                <label>Fiyat (TL)</label>
+                                <input type="number" id="prodPrice" placeholder="1500" required>
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Stok Adedi</label>
+                                <input type="number" id="prodStock" placeholder="10" required min="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Medya Dosyaları</label>
+                            <div class="file-input-wrapper">
+                                <span class="file-input-btn" id="fileLabel">Fotoğraf Ekle (Çoklu)</span>
+                                <input type="file" id="prodFiles" accept="image/*" multiple onchange="updateFileName()">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" style="background:#00ff66; border-color:#00ff66; color:#000;">VİTRİNE FIRLAT</button>
+                    </form>
+                </div>
+                <div>
+                    <h3>Müşteri Erişim Günlüğü</h3>
+                    <div id="guestLogList" class="guest-log-list"></div>
+                    <button class="btn" style="margin-top:15px; padding: 10px; font-size:10px; width: auto; background:#1e1e22; border-color:#333; color:#fff;" onclick="clearLogs()">TEMİZLE</button>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="glass p-8 rounded-3xl space-y-6 lg:col-span-1 h-fit">
-          <h3 class="text-xl font-bold text-cyan-400">Yeni Ürün Ekle</h3>
-          <div>
-            <label class="block text-sm mb-2">Ürün Adı</label>
-            <input type="text" id="newProdName" class="w-full bg-[#121829] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-sm mb-2">Ürün Fiyatı</label>
-            <input type="number" id="newProdPrice" class="w-full bg-[#121829] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-sm mb-2">Stok Adedi</label>
-            <input type="number" id="newProdStock" class="w-full bg-[#121829] border border-gray-800 rounded-xl px-4 py-3 text-white focus:outline-none" value="10">
-          </div>
-          <div>
-            <label class="block text-sm mb-2">Ürün Açıklaması</label>
-            <textarea id="newProdDesc" rows="3" class="w-full bg-[#121829] border border-gray-800 rounded-xl p-4 text-white focus:outline-none"></textarea>
-          </div>
-          <div>
-            <label class="block text-sm mb-2">Ürün Görselleri (Çoklu Seçilebilir)</label>
-            <input type="file" id="newProdPics" multiple accept="image/*" class="w-full text-sm text-gray-400 file:bg-purple-600 file:text-white file:py-2 file:px-4 file:rounded-full file:border-0 cursor-pointer">
-          </div>
-          <button id="uploadBtn" onclick="saveProductLocal()" class="w-full py-4 bg-cyan-400 text-black font-extrabold rounded-2xl hover:bg-cyan-300 transition">
-            Yayınla 🚀
-          </button>
-        </div>
-
-        <div class="glass p-8 rounded-3xl lg:col-span-2">
-          <h3 class="text-xl font-bold text-cyan-400 mb-6">Mevcut Ürünleri Yönet</h3>
-          <div id="adminProductList" class="space-y-4"></div>
-        </div>
-      </div>
-
-      <!-- Geliştirilmiş Giriş Yapan Kullanıcılar ve Detaylı Misafir Listesi -->
-      <div class="glass p-8 rounded-3xl mt-8">
-        <h3 class="text-xl font-bold text-cyan-400 mb-6">Giriş Yapıp Sipariş Veren Müşteriler / Misafirler</h3>
-        <div id="userList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-      </div>
+        <div class="section-title">DROP _01 / YENİ SEZON</div>
+        <div class="product-grid" id="productGrid"></div>
     </div>
-  </div>
 
-  <script>
-    const whatsappNum = "905519283542";
-    let cart = [];
-    let pendingAction = null;
+    <footer>&copy; 2026 VOLTERX // LABS CORP.</footer>
 
-    // Örnek başlangıç ürünleri
-    const defaultProducts = [
-      {
-        id: "sample-1",
-        name: "Oversize Cyberpunk Hoodie",
-        price: 1250,
-        stock: 8,
-        description: "Neon detaylı, özel kesim sokak tarzı rahat kapüşonlu sweatshirt.",
-        images: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80"]
-      },
-      {
-        id: "sample-2",
-        name: "Cargo Techwear Pantolon",
-        price: 1450,
-        stock: 5,
-        description: "Su geçirmez kumaş teknolojisi, çoklu cep mimarisi ogün ayarlanabilir paça bağları.",
-        images: ["https://images.unsplash.com/photo-1517462964-21fdcec3f25b?auto=format&fit=crop&w=600&q=80"]
-      }
-    ];
+    <script>
+        // Şifre maskeleme yapıları (Base64 kodlama mantığı)
+        const tY = "dGFoYQ=="; 
+        const tP = "dGFoYTEyMw==";
 
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const splash = document.getElementById('splashScreen');
-        if(splash) splash.classList.add('opacity-0', 'pointer-events-none');
-        document.body.classList.remove('overflow-hidden');
-        renderHeaderAuth();
+        const defaultProducts = [
+            { id: 1, title: "Volterx Cyberpunk Boxy Tee", desc: "400 GSM ultra ağır pamuk, siber detay baskılı sokak kesim tişört.", price: 950, stock: 12, images: ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop"] },
+            { id: 2, title: "Volterx Phantom Raw Hoodie", desc: "Eskitilmiş dikişli, yıkamalı antrasit gri oversize kalın kapüşonlu sweatshirt.", price: 1850, stock: 3, images: ["https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&auto=format&fit=crop"] }
+        ];
         
-        if (!localStorage.getItem('productsData')) {
-          localStorage.setItem('productsData', JSON.stringify(defaultProducts));
+        let products = JSON.parse(localStorage.getItem('vx_products')) || defaultProducts;
+        let cart = [];
+        let currentTab = 'customer';
+        let pendingAction = null;
+
+        function switchTab(tab) {
+            currentTab = tab;
+            if(tab === 'customer') {
+                document.getElementById('customerTab').classList.add('active');
+                document.getElementById('adminTab').classList.remove('active');
+                document.getElementById('customerForm').style.display = 'block';
+                document.getElementById('adminForm').style.display = 'none';
+            } else {
+                document.getElementById('adminTab').classList.add('active');
+                document.getElementById('customerTab').classList.remove('active');
+                document.getElementById('adminForm').style.display = 'block';
+                document.getElementById('customerForm').style.display = 'none';
+            }
         }
 
-        loadProductsAndUsers();
-        updateCartUI();
-        checkHashRoute();
-      }, 1500);
-    });
-
-    window.addEventListener('hashchange', checkHashRoute);
-
-    function checkHashRoute() {
-      const hash = window.location.hash;
-      if (hash.startsWith('#product-')) {
-        const prodId = hash.replace('#product-', '');
-        openProductDetail(prodId);
-      } else {
-        closeProductDetail();
-      }
-    }
-
-    function renderHeaderAuth() {
-      const currentCustomer = sessionStorage.getItem('customerName');
-      const badge = document.getElementById('userBadge');
-      const logout = document.getElementById('logoutBtn');
-      const guestLoginGroup = document.getElementById('guestLoginGroup');
-      const adminReturn = document.getElementById('adminReturnBtn');
-
-      if (currentCustomer) {
-        badge.innerHTML = `<i class="fas fa-user text-cyan-400"></i> ${currentCustomer}`;
-        badge.classList.remove('hidden');
-        logout.classList.remove('hidden');
-        if(guestLoginGroup) guestLoginGroup.classList.add('hidden');
-      } else {
-        badge.classList.add('hidden');
-        logout.classList.add('hidden');
-        if(guestLoginGroup) guestLoginGroup.classList.remove('hidden');
-      }
-
-      if (sessionStorage.getItem('isAdmin') === 'true') {
-        if(guestLoginGroup) guestLoginGroup.classList.add('hidden');
-        if(adminReturn) adminReturn.classList.remove('hidden');
-      } else {
-        if(adminReturn) adminReturn.classList.add('hidden');
-      }
-    }
-
-    function openAuthModal(actionType, data = null) {
-      pendingAction = { type: actionType, data: data };
-      document.getElementById('authModal').classList.remove('hidden');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('authModal').classList.add('hidden');
-      pendingAction = null;
-    }
-
-    function loginWithForm() {
-      const username = document.getElementById('customerUserInput').value.trim();
-      const pass = document.getElementById('customerPasswordInput').value.trim();
-      if (!username) return alert("Lütfen kullanıcı adınızı yazın!");
-      if (!pass) return alert("Lütfen şifrenizi yazın!");
-      
-      executeSuccessfulLogin(username, pass, false);
-    }
-
-    function loginAsGuest() {
-      const randomId = Math.floor(1000 + Math.random() * 9000);
-      const guestName = `Misafir-${randomId}`;
-      const guestPass = `msfr-${Math.floor(100000 + Math.random() * 900000)}`; // Misafire otomatik özel şifre üretimi
-      
-      executeSuccessfulLogin(guestName, guestPass, true);
-    }
-
-    function openAdminModal() { document.getElementById('adminModal').classList.remove('hidden'); }
-    function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
-
-    function executeSuccessfulLogin(name, password, isGuest) {
-      sessionStorage.setItem('customerName', name);
-      
-      // Şimdiki zamanı GG.AA.YYYY - SS:DD formatına çevirme
-      const now = new Date();
-      const dateStr = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()} - ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-      const userList = JSON.parse(localStorage.getItem('activeUsersDetails') || '[]');
-      
-      // Eğer kullanıcı listede yoksa detaylarıyla ekle
-      if (!userList.some(u => u.username === name)) {
-        userList.push({
-          username: name,
-          password: password,
-          loginTime: dateStr,
-          type: isGuest ? 'guest' : 'form'
-        });
-        localStorage.setItem('activeUsersDetails', JSON.stringify(userList));
-      }
-
-      renderHeaderAuth();
-      document.getElementById('authModal').classList.add('hidden');
-
-      if (pendingAction) {
-        if (pendingAction.type === 'directBuy') {
-          const p = pendingAction.data;
-          triggerWhatsAppMessage(p.name, p.price, p.id);
-        } else if (pendingAction.type === 'cartCheckout') {
-          triggerCartWhatsAppMessage();
+        function showAuthModal(actionAfterLogin = null) {
+            pendingAction = actionAfterLogin;
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('loginBoxContent').style.display = 'block';
+            document.getElementById('simulationLoader').style.display = 'none';
         }
-        pendingAction = null;
-      } else {
-        alert(`Hoş geldin, ${name}! Keyifli alışverişler. 🔥`);
-      }
-    }
 
-    function logoutCustomer() {
-      sessionStorage.removeItem('customerName');
-      alert("Oturum kapatıldı.");
-      location.reload();
-    }
-
-    function toggleCart() {
-      document.getElementById('cartPanel').classList.toggle('translate-x-full');
-    }
-
-    function loginAdminEncrypted() {
-      const u = document.getElementById('adminUserInput').value.trim().toLowerCase();
-      const p = document.getElementById('adminPasswordInput').value.trim();
-
-      if (!u || !p) return alert("Lütfen alanları doldurun!");
-      const encode = str => str.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 7)).reverse().join('');
-
-      if (encode(u) === "hoh{" && encode(p) === ":98hoh{") {
-        sessionStorage.setItem('isAdmin', 'true');
-        alert("Yönetici girişi onaylandı! 🛠️");
-        closeAdminModal();
-        renderHeaderAuth();
-        document.getElementById('adminPanel').classList.remove('hidden');
-        loadProductsAndUsers();
-      } else {
-        alert("Kullanıcı adı veya şifre yanlış!");
-      }
-    }
-
-    function logoutAdmin() {
-      sessionStorage.removeItem('isAdmin');
-      location.reload();
-    }
-
-    function loadProductsAndUsers() {
-      const userListEl = document.getElementById('userList');
-      if(userListEl) {
-        const savedUsers = JSON.parse(localStorage.getItem('activeUsersDetails') || '[]');
-        userListEl.innerHTML = savedUsers.length === 0 ? '<div class="col-span-full text-xs text-gray-600">Henüz kimse giriş yapmadı.</div>' : '';
-        
-        savedUsers.forEach(u => {
-          let typeBadge = u.type === 'guest' ? 
-            '<span class="text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-md font-mono"><i class="fas fa-user-secret"></i> Misafir</span>' : 
-            '<span class="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-md font-mono"><i class="fas fa-user-check"></i> Kayıtlı Müşteri</span>';
-          
-          let cardHtml = `
-            <div class="bg-[#121829] p-4 rounded-2xl border border-gray-800 space-y-2">
-              <div class="flex justify-between items-start">
-                <span class="font-bold text-sm text-white block">${u.username}</span>
-                ${typeBadge}
-              </div>
-              <div class="text-xs text-gray-400 space-y-1">
-                <p><i class="fas fa-key text-gray-600 mr-1"></i> Şifre: <span class="font-mono text-gray-200 select-all">${u.password}</span></p>
-                <p><i class="fas fa-clock text-gray-600 mr-1"></i> Giriş Zamanı: <span class="text-purple-400">${u.loginTime}</span></p>
-              </div>
-            </div>
-          `;
-          userListEl.insertAdjacentHTML('beforeend', cardHtml);
-        });
-      }
-
-      const grid = document.getElementById('productGrid');
-      const adminList = document.getElementById('adminProductList');
-      if(grid) grid.innerHTML = "";
-      if(adminList) adminList.innerHTML = "";
-
-      const products = JSON.parse(localStorage.getItem('productsData') || '[]');
-
-      if (products.length === 0) {
-        if(grid) grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Koleksiyonda ürün bulunmuyor. Yönetici panelinden hemen ekleyebilirsiniz!</div>`;
-        return;
-      }
-
-      products.forEach(p => {
-        renderCard(p);
-        renderAdminRow(p);
-      });
-    }
-
-    function renderCard(p) {
-      const grid = document.getElementById('productGrid');
-      if(!grid) return;
-      const mainImage = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80';
-      const stockBadge = p.stock <= 0 ? `<span class="absolute top-4 right-4 bg-red-600 text-white text-xs px-3 py-1 rounded-full font-bold z-10">Tükendi</span>` : '';
-      
-      const card = `
-        <div class="glass rounded-3xl overflow-hidden group hover:border-purple-500/50 transition duration-300 relative">
-          ${stockBadge}
-          <div onclick="window.location.hash='product-${p.id}'" class="relative overflow-hidden aspect-square cursor-pointer">
-            <img src="${mainImage}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-          </div>
-          <div class="p-6">
-            <h4 onclick="window.location.hash='product-${p.id}'" class="text-xl font-bold mb-2 cursor-pointer hover:text-cyan-400 transition">${p.name}</h4>
-            <p class="text-gray-400 text-sm mb-4 line-clamp-2">${p.description}</p>
-            <div class="flex items-center justify-between gap-2 mt-4">
-              <button onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled class="flex-1 py-2.5 bg-gray-800 text-gray-500 rounded-xl font-bold text-xs cursor-not-allowed"' : 'class="flex-1 py-2.5 bg-[#121829] hover:bg-purple-600/20 border border-purple-500/30 text-white rounded-xl font-bold text-xs transition"'} >
-                Sepete Ekle 🛒
-              </button>
-              <button onclick="handleDirectBuy('${p.name}', '${p.price.toLocaleString('tr-TR')} TL', '${p.id}')" class="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1">
-                Hemen Al <i class="fab fa-whatsapp"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      grid.insertAdjacentHTML('beforeend', card);
-    }
-
-    function renderAdminRow(p) {
-      const adminList = document.getElementById('adminProductList');
-      if(!adminList) return;
-      const mainImage = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80';
-      
-      const row = `
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#121829] p-4 rounded-2xl border border-gray-800">
-          <div class="flex items-center gap-4">
-            <img src="${mainImage}" class="w-12 h-12 object-cover rounded-xl border border-gray-700">
-            <div>
-              <h5 class="font-bold text-sm text-gray-200">${p.name}</h5>
-              <p class="text-xs text-purple-400">${p.price.toLocaleString('tr-TR')} TL</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            <div class="flex items-center border border-gray-700 rounded-xl bg-[#070a13] overflow-hidden">
-              <button onclick="updateStockLocal('${p.id}', -1)" class="px-3 py-1.5 hover:bg-gray-800 text-gray-400 font-bold">-</button>
-              <span id="admin-stock-${p.id}" class="px-3 text-sm font-mono text-cyan-400 min-w-[30px] text-center">${p.stock}</span>
-              <button onclick="updateStockLocal('${p.id}', 1)" class="px-3 py-1.5 hover:bg-gray-800 text-gray-400 font-bold">+</button>
-            </div>
-            <button onclick="deleteProductLocal('${p.id}')" class="p-2.5 bg-red-600/10 hover:bg-red-600 border border-red-500/20 text-red-500 hover:text-white rounded-xl transition text-xs flex items-center gap-1 font-semibold">
-              <i class="fas fa-trash"></i> Sil
-            </button>
-          </div>
-        </div>
-      `;
-      adminList.insertAdjacentHTML('beforeend', row);
-    }
-
-    function saveProductLocal() {
-      const name = document.getElementById('newProdName').value.trim();
-      const price = document.getElementById('newProdPrice').value.trim();
-      const stock = document.getElementById('newProdStock').value.trim();
-      const desc = document.getElementById('newProdDesc').value.trim();
-      const fileInput = document.getElementById('newProdPics');
-      const uploadBtn = document.getElementById('uploadBtn');
-
-      if (!name || !price) return alert("Ürün adı ve fiyatı alanları zorunludur!");
-      
-      uploadBtn.innerText = "Yayınlanıyor... ⏳";
-      uploadBtn.disabled = true;
-
-      const processData = (imageUrls) => {
-        const products = JSON.parse(localStorage.getItem('productsData') || '[]');
-        const newProduct = {
-          id: 'prod-' + Date.now(),
-          name,
-          price: parseFloat(price),
-          stock: stock ? parseInt(stock) : 10,
-          description: desc || 'Bu ürün için açıklama girilmedi.',
-          images: imageUrls.length > 0 ? imageUrls : ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=600&q=80"]
-        };
-
-        products.push(newProduct);
-        localStorage.setItem('productsData', JSON.stringify(products));
-
-        alert("Ürün başarıyla kaydedildi! 🎉");
-        
-        document.getElementById('newProdName').value = '';
-        document.getElementById('newProdPrice').value = '';
-        document.getElementById('newProdStock').value = '10';
-        document.getElementById('newProdDesc').value = '';
-        fileInput.value = '';
-
-        uploadBtn.disabled = false;
-        uploadBtn.innerText = "Yayınla 🚀";
-        
-        loadProductsAndUsers();
-      };
-
-      if (fileInput.files.length > 0) {
-        const filePromises = Array.from(fileInput.files).map(file => {
-          return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.readAsDataURL(file);
-          });
-        });
-
-        Promise.all(filePromises).then(base64Images => {
-          processData(base64Images);
-        });
-      } else {
-        processData([]);
-      }
-    }
-
-    function updateStockLocal(id, amount) {
-      const products = JSON.parse(localStorage.getItem('productsData') || '[]');
-      const prod = products.find(p => p.id === id);
-      if (prod) {
-        prod.stock = Math.max(0, prod.stock + amount);
-        localStorage.setItem('productsData', JSON.stringify(products));
-        document.getElementById(`admin-stock-${id}`).innerText = prod.stock;
-        loadProductsAndUsers();
-      }
-    }
-
-    function deleteProductLocal(id) {
-      if (!confirm("Bu ürünü silmek istediğinize emin misiniz?")) return;
-      let products = JSON.parse(localStorage.getItem('productsData') || '[]');
-      products = products.filter(p => p.id !== id);
-      localStorage.setItem('productsData', JSON.stringify(products));
-      loadProductsAndUsers();
-    }
-
-    function addToCart(id) {
-      const products = JSON.parse(localStorage.getItem('productsData') || '[]');
-      const prod = products.find(p => p.id === id);
-      if (!prod || prod.stock <= 0) return alert("Ürün stokta yok!");
-
-      const cartItem = cart.find(item => item.id === id);
-      if (cartItem) {
-        if (cartItem.quantity >= prod.stock) return alert("Maksimum stok miktarına ulaştınız!");
-        cartItem.quantity++;
-      } else {
-        cart.push({ id: prod.id, name: prod.name, price: prod.price, image: prod.images[0], quantity: 1 });
-      }
-      updateCartUI();
-    }
-
-    function updateCartUI() {
-      const cartList = document.getElementById('cartList');
-      const cartCount = document.getElementById('cartCount');
-      const cartTotal = document.getElementById('cartTotal');
-      
-      if(!cartList) return;
-      cartList.innerHTML = "";
-      
-      let total = 0;
-      let count = 0;
-
-      cart.forEach(item => {
-        total += item.price * item.quantity;
-        count += item.quantity;
-
-        const cartHtml = `
-          <div class="flex items-center justify-between bg-[#121829] p-3 rounded-2xl border border-gray-800">
-            <div class="flex items-center gap-3">
-              <img src="${item.image}" class="w-12 h-12 object-cover rounded-xl border border-gray-700">
-              <div>
-                <h5 class="text-xs font-bold text-gray-200 truncate max-w-[120px]">${item.name}</h5>
-                <p class="text-[11px] text-cyan-400">${item.price.toLocaleString('tr-TR')} TL</p>
-              </div>
-            </div>
-            <div class="flex items-center border border-gray-700 rounded-lg bg-[#070a13] overflow-hidden scale-90">
-              <button onclick="changeQty('${item.id}', -1)" class="px-2 py-1 text-xs text-gray-400 font-bold">-</button>
-              <span class="px-2 text-xs font-mono text-white">${item.quantity}</span>
-              <button onclick="changeQty('${item.id}', 1)" class="px-2 py-1 text-xs text-gray-400 font-bold">+</button>
-            </div>
-          </div>
-        `;
-        cartList.insertAdjacentHTML('beforeend', cartHtml);
-      });
-
-      cartCount.innerText = count;
-      cartTotal.innerText = `${total.toLocaleString('tr-TR')} TL`;
-    }
-
-    function changeQty(id, amount) {
-      const item = cart.find(i => i.id === id);
-      if(item) {
-        item.quantity += amount;
-        if(item.quantity <= 0) {
-          cart = cart.filter(i => i.id !== id);
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+            pendingAction = null;
         }
-        updateCartUI();
-      }
-    }
 
-    function openProductDetail(id) {
-      const products = JSON.parse(localStorage.getItem('productsData') || '[]');
-      const p = products.find(prod => prod.id === id);
-      if (!p) return;
+        function openCartWithAuthCheck() {
+            if (!sessionStorage.getItem('currentUser')) { showAuthModal('openCart'); } 
+            else { toggleCart(true); }
+        }
 
-      document.getElementById('detailTitle').innerText = p.name;
-      document.getElementById('detailDesc').innerText = p.description;
-      document.getElementById('detailPrice').innerText = `${p.price.toLocaleString('tr-TR')} TL`;
-      
-      const stockEl = document.getElementById('detailStockStatus');
-      if (p.stock <= 0) {
-        stockEl.className = "text-sm font-bold text-red-500";
-        stockEl.innerText = "Stok Durumu: Tükendi";
-      } else {
-        stockEl.className = "text-sm font-bold text-emerald-400";
-        stockEl.innerText = `Stok Durumu: ${p.stock} Adet Mevcut`;
-      }
+        function startLoginSimulation(type) {
+            if (type === 'customer') {
+                const name = document.getElementById('customerNameInput').value.trim();
+                if(!name) { alert("Bir takma ad girin!"); return; }
+                
+                triggerCyberAnimation(() => {
+                    const userData = { displayName: name, role: 'customer', photoURL: "https://img.icons8.com/ios-filled/50/ffffff/user-male-circle.png" };
+                    sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                    recordCustomerLog(name);
+                    applyLoginState(userData);
+                    finalizeLogin();
+                });
+            } else {
+                const user = document.getElementById('adminUsernameInput').value.trim();
+                const pass = document.getElementById('adminPasswordInput').value;
+                
+                if(window.btoa(user) === tY && window.btoa(pass) === tP) {
+                    triggerCyberAnimation(() => {
+                        const userData = { displayName: "TAHA (ADMIN)", role: 'admin', photoURL: "https://img.icons8.com/color/96/admin-settings-male.png" };
+                        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                        applyLoginState(userData);
+                        finalizeLogin();
+                    });
+                } else {
+                    alert("Erişim Reddedildi: Hatalı Kimlik Bilgileri!");
+                }
+            }
+        }
 
-      const mainImg = document.getElementById('detailMainImg');
-      mainImg.src = p.images[0];
+        function triggerCyberAnimation(callback) {
+            document.getElementById('loginBoxContent').style.display = 'none';
+            document.getElementById('simulationLoader').style.display = 'flex';
+            
+            const bar = document.getElementById('cyberBarElement');
+            bar.style.animation = 'none'; 
+            void bar.offsetWidth; 
+            
+            bar.style.animation = 'loadProgress 1.8s cubic-bezier(0.075, 0.82, 0.165, 1) forwards';
+            setTimeout(callback, 1800);
+        }
 
-      const thumbBox = document.getElementById('detailThumbnails');
-      thumbBox.innerHTML = "";
-      p.images.forEach(imgUrl => {
-        const thumb = document.createElement('img');
-        thumb.src = imgUrl;
-        thumb.className = "w-16 h-16 object-cover rounded-xl border border-gray-800 cursor-pointer hover:border-purple-500 transition";
-        thumb.onclick = () => mainImg.src = imgUrl;
-        thumbBox.appendChild(thumb);
-      });
+        function finalizeLogin() {
+            document.getElementById('authModal').style.display = 'none';
+            if (pendingAction === 'openCart') { toggleCart(true); } 
+            else if (pendingAction === 'whatsappCheckout') { toggleCart(true); checkoutViaWhatsApp(); }
+            pendingAction = null;
+        }
 
-      document.getElementById('detailShareLink').innerText = `${window.location.origin}${window.location.pathname}#product-${p.id}`;
-      
-      document.getElementById('detailAddBtn').onclick = () => { addToCart(p.id); };
-      document.getElementById('detailDirectBuyBtn').onclick = () => { handleDirectBuy(p.name, `${p.price.toLocaleString('tr-TR')} TL`, p.id); };
+        function applyLoginState(user) {
+            document.getElementById('logoutNavBtn').style.display = "block";
+            const profile = document.getElementById('userProfile');
+            profile.style.display = "flex";
+            document.getElementById('userImg').src = user.photoURL;
+            document.getElementById('userName').textContent = user.displayName;
 
-      document.getElementById('productDetailModal').classList.remove('hidden');
-    }
+            if (user.role === 'admin') {
+                document.body.classList.add('admin-mode');
+                document.getElementById('adminSection').style.display = "block";
+                renderLogs();
+            } else {
+                document.body.classList.remove('admin-mode');
+                document.getElementById('adminSection').style.display = "none";
+            }
+            renderProducts();
+        }
 
-    function closeProductDetail() {
-      document.getElementById('productDetailModal').classList.add('hidden');
-      if(window.location.hash.startsWith('#product-')) {
-        window.location.hash = '';
-      }
-    }
+        function handleLogout() {
+            sessionStorage.clear();
+            document.body.classList.remove('admin-mode');
+            document.getElementById('adminSection').style.display = "none";
+            document.getElementById('userProfile').style.display = "none";
+            document.getElementById('logoutNavBtn').style.display = "none";
+            document.getElementById('customerNameInput').value = '';
+            document.getElementById('adminUsernameInput').value = '';
+            document.getElementById('adminPasswordInput').value = '';
+            cart = [];
+            updateCartCount();
+            renderProducts();
+        }
 
-    function copyProductLink() {
-      const linkText = document.getElementById('detailShareLink').innerText;
-      navigator.clipboard.writeText(linkText).then(() => {
-        alert("Ürün linki panoya kopyalandı! 🔗");
-      });
-    }
+        function openProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
 
-    function handleDirectBuy(name, price, id) {
-      const currentCustomer = sessionStorage.getItem('customerName');
-      if (!currentCustomer) {
-        openAuthModal('directBuy', { name, price, id });
-      } else {
-        triggerWhatsAppMessage(name, price, id);
-      }
-    }
+            const firstImg = product.images && product.images.length > 0 ? product.images[0] : '';
+            const detailImgDiv = document.getElementById('detailImage');
+            
+            if(firstImg) { detailImgDiv.style.backgroundImage = `url('${firstImg}')`; }
+            else { detailImgDiv.style.backgroundImage = 'none'; detailImgDiv.innerHTML = '<span style="display:block; text-align:center; padding-top:200px; color:#444; font-size:11px;">MEDYA YOK</span>'; }
 
-    function triggerWhatsAppMessage(name, price, id) {
-      const customer = sessionStorage.getItem('customerName') || "Müşteri";
-      const productLink = `${window.location.origin}${window.location.pathname}#product-${id}`;
-      const message = `Selam, Ben ${customer}! modeX sitenden şu ürünü almak istiyorum! 🔥\n\nÜrün: ${name}\nFiyat: ${price}\n📍 Ürün Detayı: ${productLink}`;
-      window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(message)}`, "_blank");
-    }
+            document.getElementById('detailTitle').textContent = product.title;
+            document.getElementById('detailDesc').textContent = product.desc || "Detaylı inceleme kaydı bulunmuyor.";
+            document.getElementById('detailPrice').textContent = product.price.toLocaleString('tr-TR') + " TL";
 
-    function processOrderCheckout() {
-      if (cart.length === 0) return alert("Sepetiniz boş!");
-      const currentCustomer = sessionStorage.getItem('customerName');
-      
-      if (!currentCustomer) {
-        openAuthModal('cartCheckout');
-      } else {
-        triggerCartWhatsAppMessage();
-      }
-    }
+            const btn = document.getElementById('detailActionBtn');
+            if(product.stock === 0) {
+                btn.textContent = "STOK DIŞI"; btn.disabled = true;
+            } else {
+                btn.textContent = "SEPETE FIRLAT"; btn.disabled = false;
+                btn.onclick = function() { addToCart(product.id); closeDetailModal(); };
+            }
+            document.getElementById('detailModal').style.display = 'flex';
+        }
 
-    function triggerCartWhatsAppMessage() {
-      const customer = sessionStorage.getItem('customerName') || "Müşteri";
-      let message = `Selam, Ben ${customer}! modeX sitesinden siparişim var: 🔥\n\n`;
-      let total = 0;
-      cart.forEach((item, index) => {
-        const itemTotal = item.price * item.quantity; total += itemTotal;
-        message += `${index + 1}) ${item.name} (${item.quantity} Adet) - ${itemTotal.toLocaleString('tr-TR')} TL\n📍 Link: ${window.location.origin}${window.location.pathname}#product-${item.id}\n\n`;
-      });
-      message += `------------------------------\n💰 Toplam Tutar: ${total.toLocaleString('tr-TR')} TL`;
-      window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(message)}`, "_blank");
-    }
-  </script>
+        function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
+
+        function updateFileName() {
+            const fileInput = document.getElementById('prodFiles');
+            const label = document.getElementById('fileLabel');
+            label.textContent = fileInput.files.length > 0 ? `${fileInput.files.length} Görsel Seçildi` : "Fotoğraf Ekle (Çoklu)";
+        }
+
+        async function addProduct(event) {
+            event.preventDefault();
+            const title = document.getElementById('prodTitle').value;
+            const desc = document.getElementById('prodDesc').value;
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const stock = parseInt(document.getElementById('prodStock').value);
+            const fileInput = document.getElementById('prodFiles');
+            let imagesArray = [];
+
+            if (fileInput.files.length > 0) {
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const base64 = await convertToBase64(fileInput.files[i]);
+                    imagesArray.push(base64);
+                }
+            }
+
+            products.push({ id: Date.now(), title, desc, price, stock, images: imagesArray });
+            localStorage.setItem('vx_products', JSON.stringify(products));
+            renderProducts();
+            document.getElementById('productForm').reset();
+            document.getElementById('fileLabel').textContent = "Fotoğraf Ekle (Çoklu)";
+        }
+
+        function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function deleteProduct(id) {
+            if(confirm("Bu drop parçasını silmek istiyor musun?")) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('vx_products', JSON.stringify(products));
+                renderProducts();
+            }
+        }
+
+        function changeMainImage(productId, imageUrl, element, event) {
+            event.stopPropagation();
+            const mainImgDiv = document.getElementById(`main-img-${productId}`);
+            if (mainImgDiv) { mainImgDiv.style.backgroundImage = `url('${imageUrl}')`; }
+            const thumbs = document.querySelectorAll(`.thumb-${productId}`);
+            thumbs.forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function toggleCart(show) {
+            const sidebar = document.getElementById('cartSidebar');
+            if (show) { sidebar.classList.add('open'); renderCart(); }
+            else { sidebar.classList.remove('open'); }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            const existing = cart.find(item => item.id === productId);
+            const currentQuantity = existing ? existing.quantity : 0;
+
+            if (product.stock <= currentQuantity) { alert("Stok tükenmiş veya sınırda."); return; }
+            if (existing) { existing.quantity += 1; } else { cart.push({ ...product, quantity: 1 }); }
+            updateCartCount();
+        }
+
+        function updateCartCount() { document.getElementById('cartCount').textContent = cart.reduce((total, item) => total + item.quantity, 0); }
+
+        function renderCart() {
+            const list = document.getElementById('cartItemsList');
+            const totalText = document.getElementById('cartTotalText');
+            list.innerHTML = '';
+            if (cart.length === 0) {
+                list.innerHTML = '<div style="color:#555; text-align:center; padding-top:40px; font-size:12px;">KARTINIZ BOŞ.</div>';
+                totalText.textContent = "0,00 TL"; return;
+            }
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity; total += itemTotal;
+                const row = document.createElement('div');
+                row.className = 'cart-item';
+                row.innerHTML = `
+                    <div class="cart-item-info">
+                        <strong>${item.title}</strong>
+                        <span style="color:#888;">${item.quantity} x ${item.price.toLocaleString('tr-TR')} TL</span>
+                        <button class="remove-item-btn" onclick="removeFromCart(${item.id})">[ KALDIR ]</button>
+                    </div>
+                    <div>${itemTotal.toLocaleString('tr-TR')} TL</div>
+                `;
+                list.appendChild(row);
+            });
+            totalText.textContent = total.toLocaleString('tr-TR') + " TL";
+        }
+
+        function removeFromCart(productId) {
+            const existing = cart.find(item => item.id === productId);
+            if(existing) {
+                if(existing.quantity > 1) { existing.quantity -= 1; }
+                else { cart = cart.filter(item => item.id !== productId); }
+            }
+            updateCartCount();
+            renderCart();
+        }
+
+        function checkoutViaWhatsApp() {
+            if (!sessionStorage.getItem('currentUser')) { toggleCart(false); showAuthModal('whatsappCheckout'); return; }
+            if (cart.length === 0) { alert("Sepetiniz boş!"); return; }
+            
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            let message = `*VOLTERX ONLINE ORDER*\n\nMüşteri: ${user.displayName}\n\n`;
+            let total = 0;
+            
+            cart.forEach(item => {
+                message += `• ${item.quantity} adet - ${item.title} (${item.price * item.quantity} TL)\n`;
+                total += item.price * item.quantity;
+            });
+            
+            message += `\n*TOPLAM TUTAR:* ${total} TL\nSiparişi onaylıyorum.`;
+            const encoded = encodeURIComponent(message);
+            window.open(`https://wa.me/905000000000?text=${encoded}`, '_blank');
+        }
+
+        function recordCustomerLog(name) {
+            let logs = JSON.parse(localStorage.getItem('vx_guest_logs')) || [];
+            const timeString = new Date().toLocaleString('tr-TR');
+            logs.unshift(`${timeString} -> Müşteri: [ ${name} ] sisteme giriş yaptı.`);
+            localStorage.setItem('vx_guest_logs', JSON.stringify(logs));
+        }
+
+        function renderLogs() {
+            const list = document.getElementById('guestLogList');
+            if(!list) return;
+            let logs = JSON.parse(localStorage.getItem('vx_guest_logs')) || [];
+            list.innerHTML = logs.length === 0 ? '<div style="color:#444;">Kayıt bulunmuyor.</div>' : logs.map(l => `<div class="guest-log-item">${l}</div>`).join('');
+        }
+
+        function clearLogs() {
+            if(confirm("Tüm logları silmek istiyor musun?")) {
+                localStorage.removeItem('vx_guest_logs');
+                renderLogs();
+            }
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                const hasImages = p.images && p.images.length > 0;
+                const mainImg = hasImages ? p.images[0] : '';
+                
+                let stockClass = 'stock-in';
+                let stockText = `STOK: ${p.stock} ADET`;
+                if(p.stock === 0) { stockClass = 'stock-out'; stockText = 'STOK TÜKENDİ'; }
+                else if(p.stock <= 5) { stockClass = 'stock-low'; stockText = `SON ${p.stock} PARÇA`; }
+
+                let thumbsHtml = '';
+                if(hasImages && p.images.length > 1) {
+                    thumbsHtml = `<div class="product-gallery">`;
+                    p.images.forEach((img, idx) => {
+                        thumbsHtml += `<div class="gallery-thumb thumb-${p.id} ${idx===0?'active':''}" style="background-image:url('${img}')" onclick="changeMainImage(${p.id}, '${img}', this, event)"></div>`;
+                    });
+                    thumbsHtml += `</div>`;
+                }
+
+                let imgStyle = mainImg ? `background-image: url('${mainImg}')` : '';
+                
+                card.innerHTML = `
+                    <div class="product-image" id="main-img-${p.id}" style="${imgStyle}" onclick="openProductDetail(${p.id})">
+                        ${!mainImg ? 'GÖRSEL ENJEKTE EDİLMEDİ' : ''}
+                    </div>
+                    ${thumbsHtml}
+                    <div class="product-title" onclick="openProductDetail(${p.id})">${p.title}</div>
+                    <div class="product-desc">${p.desc || ''}</div>
+                    <div class="product-price">${p.price.toLocaleString('tr-TR')} TL</div>
+                    <div>
+                        <span class="stock-indicator ${stockClass}">${stockText}</span>
+                    </div>
+                    <button class="action-btn" ${p.stock===0?'disabled':''} onclick="addToCart(${p.id})">
+                        ${p.stock===0?'OUT OF STOCK':'SEPETE FIRLAT'}
+                    </button>
+                    <div class="admin-controls">
+                        <button class="admin-del-btn" onclick="deleteProduct(${p.id})">PARÇAYI SİL</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.onload = function() {
+            const user = sessionStorage.getItem('currentUser');
+            if (user) { applyLoginState(JSON.parse(user)); } 
+            else { renderProducts(); }
+        }
+    </script>
 </body>
 </html>
